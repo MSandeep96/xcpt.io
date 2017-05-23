@@ -1,11 +1,12 @@
 {
-	"name": "JavaScript Errors Notifier",
-	"short_name": "js_error",
-	"description": "Notifies JavaScript errors by icon in toolbar bar or notification popup",
+	"name": "Xcpt.IO",
+	"short_name": "Xcpt.IO",
+	"description": "A better version of Javascript-errors-notifier",
 	"version": "3.0.0",
 	"manifest_version": 2,
 	"background": {
 		"scripts": [
+			"jquery.js",
 			"background.js"
 		]
 	},

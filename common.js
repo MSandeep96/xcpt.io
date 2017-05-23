@@ -1,6 +1,8 @@
 var request = parseUrl(window.location.href);
 var isIFrame = window.top != window;
 
+
+
 function parseUrl(url) {
 	var params = {};
 	var query = /\?(.*)/.exec(url);

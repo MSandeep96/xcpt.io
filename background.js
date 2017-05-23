@@ -1,4 +1,27 @@
-﻿function htmlentities(str) {
+﻿var stackOverflowAnswers = [];
+
+
+function sendToServer(popupErrors,index,callback) {
+	
+	console.log("Called");
+	if(index == popupErrors.length)
+		return callback();
+	$.ajax({
+		url : 'http://localhost:3000/solutions',
+		type : 'post',
+		data : 'error=' + popupErrors[index],
+		dataType : 'json',
+		success : function(data) {
+			console.log(data.received);
+			stackOverflowAnswers.push(data.received);
+			index++;
+			sendToServer(popupErrors,index,callback);
+		}
+	});
+	
+}
+
+function htmlentities(str) {
 	var div = document.createElement('div');
 	div.appendChild(document.createTextNode(str));
 	return div.innerHTML;
@@ -112,8 +135,8 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			error.text = error.text.replace(/^Uncaught /g, '');
 
 			var errorHtml = localStorage['linkStackOverflow']
-				? '<a target="_blank" href="http://www.google.com/search?q=' + encodeURIComponent(htmlentities(error.text)) + '%20site%3Astackoverflow.com" id="">' + htmlentities(error.text) + '</a>'
-				: htmlentities(error.text);
+			? '<a target="_blank" href="http://www.google.com/search?q=' + encodeURIComponent(htmlentities(error.text)) + '%20site%3Astackoverflow.com" id="">' + htmlentities(error.text) + '</a>'
+			: htmlentities(error.text);
 
 			var m = new RegExp('^(\\w+):\s*(.+)').exec(error.text);
 			error.type = m ? m[1] : 'Uncaught Error';
@@ -138,8 +161,8 @@ function handleErrorsRequest(data, sender, sendResponse) {
 					errorHtml += '<br/>&nbsp;';
 					if(url) {
 						errorHtml += localStorage['linkViewSource']
-							? ('<a href="view-source:' + url + (line ? '#' + line : '') + '" target="_blank">' + url + (line ? ':' + line : '') + '</a>')
-							: (url + (line ? ':' + line : ''));
+						? ('<a href="view-source:' + url + (line ? '#' + line : '') + '" target="_blank">' + url + (line ? ':' + line : '') + '</a>')
+						: (url + (line ? ':' + line : ''));
 					}
 					if(method) {
 						errorHtml += ' ' + method + '()';
@@ -150,8 +173,8 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			else {
 				var url = error.url + (error.line ? ':' + error.line : '');
 				errorHtml += '<br/>&nbsp;' + (localStorage['linkViewSource']
-						? '<a href="view-source:' + error.url + (error.line ? '#' + error.line : '') + '" target="_blank">' + url + '</a>'
-						: url);
+					? '<a href="view-source:' + error.url + (error.line ? '#' + error.line : '') + '" target="_blank">' + url + '</a>'
+					: url);
 			}
 			popupErrors.push(errorHtml);
 		}
@@ -181,6 +204,9 @@ function handleErrorsRequest(data, sender, sendResponse) {
 
 		var errorsHtml = popupErrors.join('<br/><br/>');
 
+
+
+
 		if(localStorage['relativeErrorUrl'] && tabBaseUrl) {
 			errorsHtml = errorsHtml.split(tabBaseUrl + '/').join('/').split(tabBaseUrl).join('/');
 			if(localStorage['linkViewSource']) {
@@ -198,6 +224,10 @@ function handleErrorsRequest(data, sender, sendResponse) {
 		chrome.pageAction.show(sender.tab.id);
 
 		sendResponse(chrome.extension.getURL(popupUri));
+		
+		sendToServer(popupErrors,0,function(){
+			console.log(stackOverflowAnswers);
+		})
 	});
 }
 
@@ -210,3 +240,4 @@ chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
 	}
 	return true;
 });
+
