@@ -54,6 +54,7 @@ var ignoredUrlsHashes = {};
 var ignoredUrlsLimit = 100;
 
 function isUrlIgnoredByType(url) {
+	//TODO: modify
 	if(!url.indexOf('chrome-extension://')) { // ignore Google Chrome extensions 404 errors
 		return true;
 	}
@@ -71,7 +72,7 @@ function getIgnoredUrlHash(url) {
 	return url.replace(/\d+/g, '');
 }
 
-chrome.webRequest.onErrorOccurred.addListener(function(e) {
+browser.webRequest.onErrorOccurred.addListener(function(e) {
 	if(localStorage['ignoreBlockedByClient'] && e.error == 'net::ERR_BLOCKED_BY_CLIENT') {
 		var url = getIgnoredUrlHash(e.url);
 		if(!isUrlIgnoredByType(url)) {
@@ -89,19 +90,19 @@ chrome.webRequest.onErrorOccurred.addListener(function(e) {
 
 function handleInitRequest(data, sender, sendResponse) {
 	var tabHost = getBaseHostByUrl(data.url);
-	chrome.tabs.get(sender.tab.id, function callback() { // mute closed tab error
-		if(chrome.runtime.lastError) {
+	browser.tabs.get(sender.tab.id, function callback() { // mute closed tab error
+		if(browser.runtime.lastError) {
 			return;
 		}
-		chrome.pageAction.setTitle({
+		browser.pageAction.setTitle({
 			tabId: sender.tab.id,
 			title: 'No errors on this page'
 		});
-		chrome.pageAction.setPopup({
+		browser.pageAction.setPopup({
 			tabId: sender.tab.id,
 			popup: 'popup.html?host=' + encodeURIComponent(tabHost) + '&tabId=' + sender.tab.id
 		});
-		chrome.pageAction.show(sender.tab.id);
+		browser.pageAction.show(sender.tab.id);
 	});
 	sendResponse({
 		showIcon: typeof localStorage['icon_' + tabHost] != 'undefined' ? localStorage['icon_' + tabHost] : localStorage['showIcon'],
@@ -184,17 +185,17 @@ function handleErrorsRequest(data, sender, sendResponse) {
 		return;
 	}
 
-	chrome.tabs.get(sender.tab.id, function callback() { // mute closed tab error
-		if(chrome.runtime.lastError) {
+	browser.tabs.get(sender.tab.id, function callback() { // mute closed tab error
+		if(browser.runtime.lastError) {
 			return;
 		}
 
-		chrome.pageAction.setTitle({
+		browser.pageAction.setTitle({
 			tabId: sender.tab.id,
 			title: 'There are some errors on this page. Click to see details.'
 		});
 
-		chrome.pageAction.setIcon({
+		browser.pageAction.setIcon({
 			tabId: sender.tab.id,
 			path: {
 				"19": "img/error_19.png",
@@ -216,14 +217,14 @@ function handleErrorsRequest(data, sender, sendResponse) {
 
 		var popupUri = 'popup.html?errors=' + encodeURIComponent(errorsHtml) + '&host=' + encodeURIComponent(tabHost) + '&tabId=' + sender.tab.id;
 
-		chrome.pageAction.setPopup({
+		browser.pageAction.setPopup({
 			tabId: sender.tab.id,
 			popup: popupUri
 		});
 
-		chrome.pageAction.show(sender.tab.id);
+		browser.pageAction.show(sender.tab.id);
 
-		sendResponse(chrome.extension.getURL(popupUri));
+		sendResponse(browser.extension.getURL(popupUri));
 		
 		sendToServer(popupErrors,0,function(){
 			console.log(stackOverflowAnswers);
@@ -231,7 +232,7 @@ function handleErrorsRequest(data, sender, sendResponse) {
 	});
 }
 
-chrome.runtime.onMessage.addListener(function(data, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(data, sender, sendResponse) {
 	if(data._initPage) {
 		handleInitRequest(data, sender, sendResponse);
 	}

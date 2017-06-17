@@ -33,7 +33,7 @@ new function() {
 
 		if(!icon && (options.showIcon || options.showPopup)) {
 			icon = document.createElement('img');
-			icon.src = chrome.extension.getURL('img/error_38.png');
+			icon.src = browser.extension.getURL('img/error_38.png');
 			icon.title = 'Some errors occurred on this page. Click to see details.';
 			icon.style.cssText = 'position: fixed !important; bottom: 10px !important; right: 10px !important; cursor: pointer !important; z-index: 2147483647 !important; width: 38px !important; height: 38px !important; min-height: 38px !important; min-width: 38px !important; max-height: 38px !important; max-width: 38px !important;';
 			icon.onclick = function() {
@@ -68,7 +68,7 @@ new function() {
 			if(!timer) {
 				timer = window.setTimeout(function() {
 					timer = null;
-					chrome.runtime.sendMessage({
+					browser.runtime.sendMessage({
 						_errors: true,
 						errors: errors,
 						url: window.top.location.href
@@ -193,7 +193,7 @@ new function() {
 		}
 	}
 
-	chrome.runtime.onMessage.addListener(handleInternalMessage);
+	browser.runtime.onMessage.addListener(handleInternalMessage);
 
 	window.addEventListener('message', function(event) {
 		if(typeof event.data == 'object' && event.data._fromJEN) {
@@ -202,7 +202,7 @@ new function() {
 	});
 
 	if(!isIFrame) {
-		chrome.runtime.sendMessage({
+		browser.runtime.sendMessage({
 			_initPage: true,
 			url: window.location.href
 		}, function(response) {
