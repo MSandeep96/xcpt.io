@@ -3,17 +3,18 @@
 
 function sendToServer(popupErrors,index,callback) {
 	
-	console.log("Called");
+	// console.log("Called");
 	if(index == popupErrors.length)
 		return callback();
+
 	$.ajax({
 		url : 'http://localhost:3000/solutions',
 		type : 'post',
 		data : 'error=' + popupErrors[index],
 		dataType : 'json',
 		success : function(data) {
-			console.log(data.received);
-			stackOverflowAnswers.push(data.received);
+			
+			stackOverflowAnswers.push(data.answer);
 			index++;
 			sendToServer(popupErrors,index,callback);
 		}
@@ -129,7 +130,8 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			}
 			error.type = 'File not found';
 			error.text = error.url;
-			popupErrors.unshift('File not found: ' + htmlentities(error.url));
+			var extension = error.url.split('.').pop(); 
+			popupErrors.unshift('File not found ' + extension);
 		}
 		else {
 			error.text = error.text.replace(/^Uncaught /g, '');
@@ -214,20 +216,24 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			}
 		}
 
-		var popupUri = 'popup.html?errors=' + encodeURIComponent(errorsHtml) + '&host=' + encodeURIComponent(tabHost) + '&tabId=' + sender.tab.id;
-
-		chrome.pageAction.setPopup({
-			tabId: sender.tab.id,
-			popup: popupUri
-		});
-
-		chrome.pageAction.show(sender.tab.id);
-
-		sendResponse(chrome.extension.getURL(popupUri));
 		
+
 		sendToServer(popupErrors,0,function(){
+			var popupUri = 'popup.html?errors=' + encodeURIComponent(stackOverflowAnswers[0]) + '&host=' + encodeURIComponent(tabHost) + '&tabId=' + sender.tab.id;
+
+			chrome.pageAction.setPopup({
+				tabId: sender.tab.id,
+				popup: popupUri
+			});
+
+			chrome.pageAction.show(sender.tab.id);
 			console.log(stackOverflowAnswers);
+			sendResponse(chrome.extension.getURL(popupUri));
 		})
+
+		
+		
+		
 	});
 }
 

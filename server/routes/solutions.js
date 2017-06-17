@@ -8,11 +8,17 @@ var google = require('google');
 var zlib = require("zlib");
 var http = require('http');
 
-router.checkAndScrapeGoogle = function(req,res) {
+
+
+router.checkAndScrapeGoogle = function(req,response) {
+	
 	google.resultsPerPage = 10;
 	var ERROR = striptags(req.body.error,'<br/>');
 	var link = null;
-	// var allAnswers
+	
+	var answerContent = null;
+
+
 	google(ERROR,function(err,res){
 
 		for(var i = 0;i < res.links.length;i++) {
@@ -23,12 +29,33 @@ router.checkAndScrapeGoogle = function(req,res) {
 			
 		}
 		if(link !== null)
-			router.getGzipped('http://api.stackexchange.com/2.2/questions/' + router.getQuestionIdFromLink(link) + '/answers/?order=desc&sort=activity&site=stackoverflow', function (err, data) {
+			router.getGzipped('http://api.stackexchange.com/2.2/questions/' + router.getQuestionIdFromLink(link) + '/answers/?order=desc&sort=votes&min=1&max=10&site=stackoverflow&filter=!9YdnSMKKT', function (err, data) {
 				if(err){
 					console.error(err);
 				}
 				else{
+					data = JSON.parse(data);
 					
+					var allAnswers = data.items;
+
+					var allAnswersCount = data.items.length;
+
+
+
+					for(var i = 0;i < allAnswersCount;i++)
+					{
+						if(allAnswers[i].isAccepted) {
+							
+							answerContent = allAnswers[i].body;
+							break;
+						}
+
+					}
+
+					if(answerContent === null) 						
+						answerContent = allAnswers[0].body;					
+
+					response.json({answer: answerContent});
 				}
 			});
 
