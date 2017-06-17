@@ -25,7 +25,7 @@ function sendMessage(data) {
 		window.top.postMessage(data, '*');
 	}
 	else if(request.tabId) {
-		chrome.tabs.sendMessage(request.tabId, data);
+		browser.tabs.sendMessage(request.tabId, data);
 	}
 }
 
