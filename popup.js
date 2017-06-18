@@ -8,10 +8,14 @@ function sendToServer(error) {
 		data: 'error=' + error,
 		dataType: 'json',
 		success: function(data) {
+
 			$(".fa-refresh").hide();
-			$(".solution").html(data.answer);
+			$(".sol").empty();
+			$(".sol").append(data.answer);
 		},
 		error: function(a,b,c) {
+			$(".fa-refresh").removeClass('fa-spin');
+			$(".refresh").append('<p>Some error occurred.</p>');
 			console.log(c);
 		}
 	});
@@ -50,6 +54,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		$("#errors").fadeOut();
 		$(".solution").fadeIn();
 		sendToServer($(this).parent().parent().data('error'));
+	})
+
+	$(document).on('click','.fa-arrow-left',function(){
+		$(".solution").hide();
+		$("#errors").fadeIn();
 	})
 });
 

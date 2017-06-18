@@ -35,7 +35,7 @@ router.checkAndScrapeGoogle = function(req,response) {
 					break;		
 
 			}
-			if(link !== null)
+			if(link !== null) {
 				router.getGzipped('http://api.stackexchange.com/2.2/questions/' + router.getQuestionIdFromLink(link) + '/answers/?order=desc&sort=votes&min=1&max=10&site=stackoverflow&filter=!9YdnSMKKT', function (err, data) {
 					if(err){
 						console.error(err);
@@ -66,7 +66,7 @@ router.checkAndScrapeGoogle = function(req,response) {
 					}
 				});
 
-
+			}
 		}
 	});
 

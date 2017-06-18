@@ -2,9 +2,9 @@ html,body
 {
 	margin: 0;
 	padding: 0;
-	min-height: 300px;
+	min-height: 350px;
 	min-width: 300px;
-	max-height: 300px;
+	max-height: 450px;
 	max-width: 300px;
 }
 *,p
@@ -44,12 +44,14 @@ nav p
 	font-size: 15px;
 	background: #E0E0E0;
 	padding: 12px;
+	border-bottom: solid 1.3px #FFF;
 }
 
 .errorNode i
 {
 	margin-right: 20px;
 	margin-top: 10px;
+	cursor: pointer;
 
 }
 pre
@@ -73,11 +75,18 @@ pre
 .solution .refresh
 {
 	height: 50px;
-	width: 50px;
+	width: 200px;
 	position: absolute;
 	top:0;
 	bottom: 0;
 	left: 0;
 	right: 0;
+	text-align: center;
 	margin: auto;
+}
+
+.fa-arrow-left
+{
+	cursor: pointer;
+	margin-bottom: 12px;
 }

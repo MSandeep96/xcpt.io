@@ -109,7 +109,7 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			error.type = 'File not found';
 			error.text = error.url;
 			var extension = error.url.split('.').pop(); 
-			popupErrors.unshift('<div class="errorNode" data-error="File not found: ' + extension + '">File not found: ' + extension + '<p><i class="fa fa-stack-overflow fa-2x so"></i><i class="fa fa-google fa-2x google"></i></div>');
+			popupErrors.unshift('<div class="errorNode" data-error="File not found: ' + extension + '">' + extension + ' File not found<p><i class="fa fa-stack-overflow fa-2x so"></i><i class="fa fa-google fa-2x google"></i></div>');
 		}
 		else {
 			error.text = error.text.replace(/^Uncaught /g, '');
@@ -144,7 +144,7 @@ function handleErrorsRequest(data, sender, sendResponse) {
 			}
 		});
 
-		var errorsHtml = popupErrors.join('<br/><br/>');
+		var errorsHtml = popupErrors.join('');
 
 		if(localStorage['relativeErrorUrl'] && tabBaseUrl) {
 			errorsHtml = errorsHtml.split(tabBaseUrl + '/').join('/').split(tabBaseUrl).join('/');
